@@ -16,3 +16,51 @@
  */
 
 package com.example.android.devbyteviewer.database
+
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.room.*
+
+@Dao
+interface VideoDao {
+
+    // fetch all available videos from DB
+    @Query("select * from databasevideo")
+    fun getVideos(): LiveData<List<DatabaseVideo>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(vararg videos: DatabaseVideo)
+
+}
+
+@Database(entities = [DatabaseVideo::class], version = 1)
+abstract class VideosDatabase : RoomDatabase() {
+
+    // DB has a reference to the DAO (abstract, as it's but an interface
+    abstract val videoDao: VideoDao
+
+}
+
+// singleton instance of the DB
+private lateinit var INSTANCE: VideosDatabase
+
+// getter to retrieve a reference to the (singleton) DB object
+fun getDatabase(context: Context): VideosDatabase {
+
+    // ensure thread safety
+    synchronized(VideosDatabase::class.java) {
+
+        // DB already initialized?
+        if (!::INSTANCE.isInitialized) {
+
+            // nope - initialize it here (once and for all)
+            INSTANCE = Room.databaseBuilder(context.applicationContext,
+                VideosDatabase::class.java,
+                "videos").build()
+        }
+
+    }
+
+    // return reference to (initialized) DB object
+    return INSTANCE
+}

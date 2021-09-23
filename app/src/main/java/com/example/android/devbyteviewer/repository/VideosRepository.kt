@@ -16,3 +16,38 @@
  */
 
 package com.example.android.devbyteviewer.repository
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.example.android.devbyteviewer.database.VideosDatabase
+import com.example.android.devbyteviewer.database.asDomainModel
+import com.example.android.devbyteviewer.domain.Video
+import com.example.android.devbyteviewer.network.Network
+import com.example.android.devbyteviewer.network.asDatabaseModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+// initiate repo for our data
+// 'dependency injection: DB passed via the constructor
+class VideosRepository(private val database: VideosDatabase) {
+
+    // getting data from DB and updating data in memory (and, by extension via LiveData, the UI)
+    val videos: LiveData<List<Video>> = Transformations.map(database.videoDao.getVideos()) {
+
+        // use DB class extension functions to convert from 'DB video' to 'domain video' items
+        it.asDomainModel()
+    }
+
+    // updating data in DB
+    suspend fun refreshVideos() {
+        withContext(Dispatchers.IO) {
+            val playlist = Network.devbytes.getPlaylist().await()
+
+            // DAO method 'insertAll' allows to be called with 'varargs' --> use 'spread operator'
+            // (*SOMEVARNAME) to turn a List<> into separate 'varargs')
+            database.videoDao.insertAll(*playlist.asDatabaseModel())
+        }
+    }
+
+}
+

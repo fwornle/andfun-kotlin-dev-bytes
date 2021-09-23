@@ -15,20 +15,31 @@
  *
  */
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: "androidx.navigation.safeargs"
-apply plugin: 'kotlin-android-extensions'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'androidx.navigation.safeargs'
+    id 'kotlin-parcelize'
+}
+
+//apply plugin: 'com.android.application'
+//apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-kapt'
+//apply plugin: 'androidx.navigation.safeargs'
+//apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.example.android.devbyteviewer"
         minSdkVersion 19
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
+
+        // avoid dex error
+        // https://stackoverflow.com/questions/52801386/error-cannot-fit-requested-classes-in-a-single-dex-file-methods-67593-655
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
     }
@@ -42,58 +53,63 @@ android {
     buildFeatures {
         dataBinding true
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version_kotlin"
 
-}
+        // Support libraries
+        implementation "androidx.appcompat:appcompat:$version_appcompat"
+        implementation "androidx.fragment:fragment:$version_fragment"
+        implementation "androidx.constraintlayout:constraintlayout:$version_constraint_layout"
 
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$version_kotlin"
+        // Android KTX
+        implementation "androidx.core:core-ktx:$version_core"
 
-    // Support libraries
-    implementation "androidx.appcompat:appcompat:$version_appcompat"
-    implementation "androidx.fragment:fragment:$version_fragment"
-    implementation "androidx.constraintlayout:constraintlayout:$version_constraint_layout"
+        // Navigation
+        implementation "androidx.navigation:navigation-fragment-ktx:$version_navigation"
+        implementation "androidx.navigation:navigation-ui-ktx:$version_navigation"
 
-    // Android KTX
-    implementation "androidx.core:core-ktx:$version_core"
+        // Coroutines for getting off the UI thread
+        // implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_kotlin_coroutines"
+        // implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version_kotlin_coroutines"
 
-    // Navigation
-    implementation "android.arch.navigation:navigation-fragment-ktx:$version_navigation"
-    implementation "android.arch.navigation:navigation-ui-ktx:$version_navigation"
+        // Retrofit for networking
+        implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
+        implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
+        implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$version_retrofit_coroutines_adapter"
 
-    // Coroutines for getting off the UI thread
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_kotlin_coroutines"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version_kotlin_coroutines"
+        // Moshi for parsing the JSON format
+        implementation "com.squareup.moshi:moshi:$version_moshi"
+        implementation "com.squareup.moshi:moshi-kotlin:$version_moshi"
 
-    // Retrofit for networking
-    implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
-    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$version_retrofit_coroutines_adapter"
+        // Joda time library for dealing with time
+        implementation "joda-time:joda-time:$version_joda"
 
-    // Moshi for parsing the JSON format
-    implementation "com.squareup.moshi:moshi:$version_moshi"
-    implementation "com.squareup.moshi:moshi-kotlin:$version_moshi"
+        // ViewModel and LiveData (arch components)
+        implementation "androidx.lifecycle:lifecycle-extensions:$version_lifecycle_extensions"
+        implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$version_lifecycle"
 
-    // Joda time library for dealing with time
-    implementation "joda-time:joda-time:$version_joda"
+        // Logging
+        implementation "com.jakewharton.timber:timber:$version_timber"
 
-    // ViewModel and LiveData (arch components)
-    implementation "androidx.lifecycle:lifecycle-extensions:$version_lifecycle_extensions"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+        // Glide for images
+        implementation "com.github.bumptech.glide:glide:$version_glide"
 
-    // Logging
-    implementation "com.jakewharton.timber:timber:$version_timber"
+        // Room database
+        implementation "androidx.room:room-runtime:$version_room"
+        kapt "androidx.room:room-compiler:$version_room"
 
-    // Glide for images
-    implementation "com.github.bumptech.glide:glide:$version_glide"
+        // Kotlin Extensions and Coroutines support for Room
+        implementation "androidx.room:room-ktx:$version_room"
 
-    // Room database
-    implementation "androidx.room:room-runtime:$version_room"
-    kapt "androidx.room:room-compiler:$version_room"
-
-    // Kotlin Extensions and Coroutines support for Room
-    implementation "androidx.room:room-ktx:$version_room"
-
-    // WorkManager
-    implementation "android.arch.work:work-runtime-ktx:$version_work"
+        // WorkManager
+        implementation "android.arch.work:work-runtime-ktx:$version_work"
+    }
 }
