@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
  */
 class DevByteApplication : Application() {
 
-    val applicationScope = CoroutineScope(Dispatchers.Default)
+    private val applicationScope = CoroutineScope(Dispatchers.Default)
 
     private fun delayedInit() {
         applicationScope.launch {
@@ -52,11 +52,11 @@ class DevByteApplication : Application() {
                 }.build()
 
         val repeatingRequest
-                = PeriodicWorkRequestBuilder<RefreshDataWorker>(1, TimeUnit.DAYS)
+                = PeriodicWorkRequestBuilder<RefreshDataWorker>(1, TimeUnit.MINUTES)
                 .setConstraints(constraints)
                 .build()
 
-        WorkManager.getInstance().enqueueUniquePeriodicWork(
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
                 RefreshDataWorker.WORK_NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
                 repeatingRequest)
