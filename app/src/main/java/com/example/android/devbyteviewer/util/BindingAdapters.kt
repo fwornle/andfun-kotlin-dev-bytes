@@ -20,7 +20,10 @@ package com.example.android.devbyteviewer.util
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
+import com.bumptech.glide.Glide.with
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
+
 
 /**
  * Binding adapter used to hide the spinner once data is available
@@ -35,5 +38,10 @@ fun goneIfNotNull(view: View, it: Any?) {
  */
 @BindingAdapter("imageUrl")
 fun setImageUrl(imageView: ImageView, url: String) {
-    Glide.with(imageView.context).load(url).into(imageView)
+    //Glide.with(imageView.context).load(url).into(imageView)
+
+    // fw-210923: avoid glide crash
+    // see: answer of...
+    // https://stackoverflow.com/questions/49901629/glide-showing-error-failed-to-find-generatedappglidemodule
+    GlideApp.with(imageView.context).load(url).into(imageView)
 }
