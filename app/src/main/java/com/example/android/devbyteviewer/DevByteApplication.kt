@@ -44,6 +44,7 @@ class DevByteApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
+        delayedInit()
     }
 
     // set-up initialization to run off the main thread
