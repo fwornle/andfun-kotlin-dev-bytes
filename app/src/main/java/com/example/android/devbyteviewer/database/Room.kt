@@ -33,7 +33,7 @@ interface VideoDao {
 
 }
 
-@Database(entities = [DatabaseVideo::class], version = 1)
+@Database(entities = [DatabaseVideo::class], version = 1, exportSchema = false)
 abstract class VideosDatabase : RoomDatabase() {
 
     // DB has a reference to the DAO (abstract, as it's but an interface
