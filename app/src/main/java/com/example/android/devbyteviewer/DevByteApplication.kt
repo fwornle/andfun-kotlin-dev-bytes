@@ -18,7 +18,7 @@
 package com.example.android.devbyteviewer
 
 import android.app.Application
-import android.icu.util.TimeUnit
+import java.util.concurrent.TimeUnit
 import android.os.Build
 import androidx.work.*
 import com.example.android.devbyteviewer.work.RefreshDataWorker
@@ -44,6 +44,8 @@ class DevByteApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
+
+        // run this off the main thread... (Dispatchers.Default)
         delayedInit()
     }
 
@@ -70,13 +72,13 @@ class DevByteApplication : Application() {
         // define a 'repeating request'
         val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(
             1,
-            java.util.concurrent.TimeUnit.DAYS
+            TimeUnit.MINUTES
         )
             .setConstraints(constraints)
             .build()
 
         // register 'repeating request' with WorkManager for the specified 'work job'
-        WorkManager.getInstance().enqueueUniquePeriodicWork(
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             RefreshDataWorker.WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
             repeatingRequest)
